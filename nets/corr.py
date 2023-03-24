@@ -125,7 +125,7 @@ class AGCL:
             offsets = offsets.reshape(2, -1).permute(1, 0)
             for d in sorted((0, 2, 3)):
                 offsets = offsets.unsqueeze(d)
-            offsets = offsets.repeat_interleave(N, dim=0)
+            offsets = offsets.repeat_interleave(torch.tensor([N], device=self.fmap1.device), dim=0)
             offsets = offsets + extra_offset
 
             coords = self.coords + flow  # [N, 2, H, W]
@@ -137,7 +137,7 @@ class AGCL:
                 right_feature, coords
             )  # [N, C, search_num*H, W]
             right_feature = right_feature.reshape(N, C, -1, H, W)  # [N, C, search_num, H, W]
-            left_feature = left_feature.unsqueeze(2).repeat_interleave(right_feature.shape[2], dim=2)
+            left_feature = left_feature.unsqueeze(2).repeat_interleave(torch.tensor([right_feature.shape[2]], device=self.fmap1.device), dim=2)
 
             corr = torch.mean(left_feature * right_feature, dim=1)
 
